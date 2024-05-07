@@ -160,7 +160,7 @@ def show_rent_list(role):
             reject_button = ttk.Button(tree_frame, text="Reject",
                                        command=lambda rentId=rent.id: operate_rent_order("reject", rentId))
             reject_button.grid(row=i, column=len(rent_attributes) + 2)
-            # return
+
         if role == 2 and rent.status == "Approved":
             rent_button = ttk.Button(tree_frame, text="Pay", command=lambda carId=rent.id: rent_form_popup(carId))
             rent_button.grid(row=i, column=len(rent_attributes) + 1)
