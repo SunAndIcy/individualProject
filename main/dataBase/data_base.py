@@ -24,7 +24,12 @@ class DatabaseManager:
 
     def find_record_by_field(self, table_name, field, value):
         # 根据字段值查询记录
-        self.cursor.execute(f'SELECT * FROM {table_name} WHERE {field}=?', (value,))
+        self.cursor.execute(f'SELECT * FROM {table_name} WHERE deleted = 0 and {field}=?', (value,))
+        return self.cursor.fetchone()
+
+    def find_record_by_field(self, table_name, field1, value1, field2, value2):
+        # 根据字段值查询记录
+        self.cursor.execute(f'SELECT * FROM {table_name} WHERE deleted = 0 and {field1}=? and {field2}=?', (value1, value2))
         return self.cursor.fetchone()
 
     def find_record_by_fields(self, table_name, fields):
@@ -46,6 +51,11 @@ class DatabaseManager:
         self.cursor.execute(f'UPDATE {table_name} SET {update_field}=? WHERE {condition_field}=?', (update_value, condition_value))
         self.conn.commit()
 
+    def update_records(self, table_name, updateFields, conditionField, conditionValue):
+        set_clause = ", ".join([f"{key}= '{value}'" for key, value in updateFields.items()])
+        sql = f"UPDATE {table_name} SET {set_clause} WHERE {conditionField} = {conditionValue}"
+        self.cursor.execute(sql)
+        self.conn.commit()
 
     def __del__(self):
         # 在销毁对象时关闭数据库连接

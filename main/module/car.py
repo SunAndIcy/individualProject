@@ -1,5 +1,5 @@
 class Car:
-    def __init__(self, id, make, model, year, mileage, availableNow, minRentPeriod, maxRentPeriod, gmtCreated, gmtModified, deleted):
+    def __init__(self, id, make, model, year, mileage, availableNow, minRentPeriod, maxRentPeriod, gmtCreated, gmtModified, deleted, rate, userId):
         self._id = id
         self._make = make
         self._model = model
@@ -11,6 +11,8 @@ class Car:
         self._gmtCreated = gmtCreated
         self._gmtModified = gmtModified
         self._deleted = deleted
+        self._rate = rate
+        self._userId = userId
 
     @staticmethod
     def create_car_from_tuple(data_tuple):
@@ -88,3 +90,19 @@ class Car:
     @maxRentPeriod.setter
     def maxRentPeriod(self, value):
         self._maxRentPeriod = value
+
+    @property
+    def rate(self):
+        return self._rate
+
+    @rate.setter
+    def rate(self, value):
+        self._rate = value
+
+    @property
+    def userId(self):
+        return self._userId
+
+    @userId.setter
+    def userId(self, value):
+        self._userId = value
