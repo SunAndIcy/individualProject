@@ -1,4 +1,4 @@
-from main.dataBase.data_base import DatabaseManager
+from main.dao.data_base import DatabaseManager
 
 
 class UserManager:

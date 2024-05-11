@@ -1,10 +1,10 @@
 from main.manager.user_manager import UserManager
 from main.manager.car_manager import CarManager
-from main.module.user import User
-from main.module.car import Car
+from main.dao.module.user import User
+from main.dao.module.car import Car
 from datetime import datetime
 from main.manager.rent_manager import RentManager
-from main.module.rent_order import RentOrder
+from main.dao.module.rent_order import RentOrder
 import threading
 import sys
 

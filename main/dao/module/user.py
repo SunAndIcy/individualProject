@@ -1,5 +1,4 @@
 class User:
-
     def __init__(self, id, userName, password, gmtCreated, gmtModified, role, deleted):
         self._id = id
         self._userName = userName
