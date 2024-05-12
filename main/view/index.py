@@ -1,86 +1,60 @@
-from main.manager.user_manager import UserManager
-from main.manager.car_manager import CarManager
-from main.dao.module.user import User
-from main.dao.module.car import Car
-from datetime import datetime
-from main.manager.rent_manager import RentManager
-from main.dao.module.rent_order import RentOrder
-import threading
 import sys
+from datetime import datetime
 
-local_data = threading.local()
-
-
-def set_current_user(user):
-    local_data.user = user
-
-
-def get_current_user():
-    return getattr(local_data, 'user', None)
-
-
-def on_closing():
-    user = get_current_user()
-    if user:
-        print(f"User {user.userName} logged out.")
-        del local_data.user
-
-
-def set_login_user(user):
-    set_current_user(user)
-    print(f"User {user.userName} logged in.")
+from main.dao.module.car import Car
+from main.dao.module.rent_order import RentOrder
+from main.dao.module.user_factory import UserFactory
+from main.enums.role_enum import Role
+from main.manager.car_manager import CarManager
+from main.manager.rent_manager import RentManager
+from main.util.thread_local import get_current_user, on_closing
 
 
 class CarRentalSystem:
 
     def register(self, role):
         print(f"\n{role} Registration:")
-        username = input("Enter username: ")
+        userName = input("Enter username: ")
         password = input("Enter password: ")
 
-        if not username or not password:
-            print("Please enter both username and password!")
+        if not userName or not password:
+            print("Please enter both userName and password!")
             return
 
-        # 在这里添加保存用户信息的逻辑
-        userManager = UserManager()
-        userManager.create_user_table()
 
-        user = userManager.select_user_fields({"user_name": username, "role": role});
+        register_success = None
+        if role == Role.ADMIN.value:
+            admin = UserFactory.create_user(userName, password, role)
+            register_success = admin.register()
+        else:
+            customer = UserFactory.create_user(userName, password, role)
+            register_success = customer.register()
 
-        if user:
-            print("The user is exit, Please login.")
+        if not register_success:
             return
-
-        userManager.insert_user((username, password, datetime.now(), datetime.now(), role, 0))
-        print("Registration successful!")
 
     def login(self, role):
         print("Please Login:")
-        username = input("Please Enter username: ")
+        userName = input("Please Enter username: ")
         password = input("Please Enter password: ")
 
-        if not username or not password:
-            print("Please enter both username and password!")
+        if not userName or not password:
+            print("Please enter both userName and password!")
             return
 
-        userManager = UserManager()
-        result = userManager.select_user_fields({"user_name": username, "role": role});
+        login_success = None
+        if role == Role.ADMIN.value:
+            admin = UserFactory.create_user(userName, password, role)
+            login_success = admin.login()
+        else:
+            customer = UserFactory.create_user(userName, password, role)
+            login_success = customer.login()
 
-        if not result:
-            print("The user is not exit, Please regist!")
+        if not login_success:
             return
-
-        user = User(*result)
-
-        if password != user.password:
-            print("The password is not correct, Please try again!")
-            return
-
-        set_login_user(user)
 
         # admin menu
-        if role == 1:
+        if role == Role.ADMIN.value:
             self.admin_menu(role)
             return
         # customer menu
@@ -106,7 +80,7 @@ class CarRentalSystem:
 
     def my_rent_order(self, role):
         rentManager = RentManager()
-        rentManager.create_rental_table()
+        # rentManager.create_rental_table()
         rent_data = None
         user = get_current_user()
         rent_cars = rentManager.select_rental_fields({"deleted": 0, "user_id": user.id});
@@ -160,7 +134,6 @@ class CarRentalSystem:
 
     def show_rent_list(self, role):
         rentManager = RentManager()
-        rentManager.create_rental_table()
         rent_data = None
 
         rent_cars = rentManager.select_rental_fields({"deleted": 0});
@@ -192,7 +165,7 @@ class CarRentalSystem:
         self.rent_order_option(role)
 
     def rent_order_option(self, role):
-        if role == 1:
+        if role == Role.ADMIN.value:
             self.admin_rent_order_option(role)
         else:
             self.customer_rent_order_option(role)
@@ -301,7 +274,7 @@ class CarRentalSystem:
         carManager = CarManager()
         user = get_current_user()
         car_data = None
-        if role == 1:
+        if role == Role.ADMIN.value:
             carRes = carManager.select_car_fields({"deleted": 0, "user_id": user.id});
             car_data = [Car.create_car_from_tuple(data) for data in carRes]
         else:
@@ -330,7 +303,7 @@ class CarRentalSystem:
                 formatted_value += f"{value:^{field_width}}|"
             print(formatted_value)
             print("-" * 150)
-        if role == 1:
+        if role == Role.ADMIN.value:
             self.admin_edit_option(role)
             return
 
@@ -393,7 +366,6 @@ class CarRentalSystem:
 
         # 保存数据库
         rentManager = RentManager();
-        rentManager.create_rental_table()
 
         user = get_current_user()
         cost = int(days) * int(car.rate)
@@ -538,7 +510,6 @@ class CarRentalSystem:
             self.add_car()
         # 保存数据库
         carManager = CarManager();
-        carManager.create_car_table()
 
         user = get_current_user()
         carManager.insert_car((make, model, year, mileage, radio, minimumRent, maximumRent, datetime.now(),

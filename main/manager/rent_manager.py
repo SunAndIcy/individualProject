@@ -5,28 +5,26 @@ class RentManager:
     db_name = 'car_rental.db'
     table_name = 'rental'
 
-    def create_rental_table(self):
-        # 创建租赁表
-        rental_columns = [
-            "user_id INTEGER NOT NULL",
-            "user_name VARCHAR(32) NOT NULL",
-            "car_id INTEGER NOT NULL",
-            "make VARCHAR(32) NOT NULL",
-            "model VARCHAR(32) NOT NULL",
-            "year VARCHAR(32) NOT NULL",
-            "mileage INTEGER NOT NULL",
-            "rental_start_day TIMESTAMP NOT NULL",
-            "rental_days INTEGER NOT NULL",
-            "rate DOUBLE NOT NULL",
-            "cost DOUBLE DEFAULT NULL",
-            "status INTEGER DEFAULT 1",
-            "gmt_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-            "gmt_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-            "deleted INTEGER DEFAULT 0"
-        ]
+    rental_columns = [
+        "user_id INTEGER NOT NULL",
+        "user_name VARCHAR(32) NOT NULL",
+        "car_id INTEGER NOT NULL",
+        "make VARCHAR(32) NOT NULL",
+        "model VARCHAR(32) NOT NULL",
+        "year VARCHAR(32) NOT NULL",
+        "mileage INTEGER NOT NULL",
+        "rental_start_day TIMESTAMP NOT NULL",
+        "rental_days INTEGER NOT NULL",
+        "rate DOUBLE NOT NULL",
+        "cost DOUBLE DEFAULT NULL",
+        "status INTEGER DEFAULT 1",
+        "gmt_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "gmt_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "deleted INTEGER DEFAULT 0"
+    ]
+    def __init__(self):
         dataManager = DatabaseManager(self.db_name)
-
-        dataManager.create_table(self.table_name, rental_columns)
+        dataManager.create_table(self.table_name, self.rental_columns)
 
     def insert_rental(self, values):
         dataManager = DatabaseManager(self.db_name)
